@@ -1,0 +1,19 @@
+description: Ultralytics YOLO11m model trained on /content/tugas_akhir_dataset/data.yaml
+author: Ultralytics
+date: '2025-06-04T20:49:17.556272'
+version: 8.3.136
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: fresh_orange
+  1: rotten_orange-fresh_orange
+args:
+  batch: 1
+  half: false
+channels: 3
