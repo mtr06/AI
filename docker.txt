@@ -1,0 +1,100 @@
+Build dan Run dengan Docker
+Opsi 1: Menggunakan Docker Compose (Recommended)
+bash# Build dan jalankan container
+docker-compose up -d --build
+
+# Melihat logs
+docker-compose logs -f
+
+# Stop container
+docker-compose down
+
+# Rebuild setelah perubahan code
+docker-compose up -d --build --force-recreate
+Opsi 2: Menggunakan Docker Commands Manual
+bash# Build image
+docker build -t ai-ghaylan:latest .
+
+# Run container
+docker run -d \
+  --name ai-ghaylan-app \
+  -p 8000:8000 \
+  -v $(pwd)/hasil:/app/results \
+  -v $(pwd)/uploads:/app/uploads \
+  ai-ghaylan:latest
+
+# Melihat logs
+docker logs -f ai-ghaylan-app
+
+# Stop dan remove container
+docker stop ai-ghaylan-app
+docker rm ai-ghaylan-app
+Testing API
+Setelah container berjalan, API akan tersedia di:
+
+API Documentation: http://localhost:8000/docs
+Alternative Docs: http://localhost:8000/redoc
+
+Test dengan cURL:
+bashcurl -X POST "http://localhost:8000/predict/" \
+  -H "accept: application/json" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@test.jpg" \
+  -F "berat_kardus=5000" \
+  -F "berat_per_jeruk=150" \
+  -F "z=1.96" \
+  -F "folder=hasil"
+Monitoring dan Maintenance
+Melihat Status Container
+bashdocker ps
+docker-compose ps
+Mengakses Container Shell
+bashdocker exec -it ai-ghaylan-app bash
+# atau dengan docker-compose
+docker-compose exec ai-ghaylan bash
+Melihat Resource Usage
+bashdocker stats ai-ghaylan-app
+Backup Model dan Results
+bash# Backup hasil deteksi
+docker cp ai-ghaylan-app:/app/results ./backup-results
+
+# Backup model files
+docker cp ai-ghaylan-app:/app/yolov11m_tugas_akhir_pretrained_ncnn_model ./backup-model
+Troubleshooting
+Error: Model tidak ditemukan
+
+Pastikan folder yolov11m_tugas_akhir_pretrained_ncnn_model ada
+Check file permissions: chmod -R 755 yolov11m_tugas_akhir_pretrained_ncnn_model/
+
+Error: OpenCV/NCNN dependency
+
+Container akan otomatis install dependencies yang diperlukan
+Jika masih error, rebuild dengan --no-cache: docker build --no-cache -t ai-ghaylan .
+
+Memory Issues
+
+Model NCNN membutuhkan ~1GB RAM minimum
+Sesuaikan deploy.resources di docker-compose.yml sesuai kebutuhan
+
+Port Already in Use
+bash# Cek port yang digunakan
+netstat -tlnp | grep :8000
+
+# Gunakan port lain
+docker run -p 8001:8000 ai-ghaylan:latest
+Production Deployment Tips
+
+Reverse Proxy: Gunakan Nginx/Traefik untuk HTTPS dan load balancing
+Secrets Management: Jangan hardcode sensitive data
+Logging: Setup centralized logging dengan ELK stack
+Monitoring: Gunakan Prometheus + Grafana untuk monitoring
+Auto-restart: Gunakan restart: unless-stopped di docker-compose
+Resource Limits: Set memory dan CPU limits sesuai kebutuhan server
+
+Environment Variables (Optional)
+Tambahkan di docker-compose.yml untuk kustomisasi:
+yamlenvironment:
+  - MODEL_PATH=/app/yolov11m_tugas_akhir_pretrained_ncnn_model
+  - RESULTS_PATH=/app/results
+  - MAX_FILE_SIZE=10485760  # 10MB
+  - WORKERS=1
