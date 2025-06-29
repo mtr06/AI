@@ -1,0 +1,47 @@
+# Git files
+.git
+.gitignore
+
+# Python cache and virtual environment
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv
+venv/
+Scripts/
+share/
+pyvenv.cfg
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+*.md
+
+# Test files
+test.jpg
+temp_*
+
+# Large model files that are not NCNN (keep only NCNN model)
+*.pt
+*.torchscript
+*.zip
+
+# Logs and temporary files
+*.log
+temp/
+uploads/
+hasil/
+
+# Development files
+main.py

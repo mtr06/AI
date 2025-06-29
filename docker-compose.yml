@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  ai-ghaylan:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount volume for persistent storage of results
+      - ./hasil:/app/results
+      - ./uploads:/app/uploads
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+
+networks:
+  default:
+    name: ai-ghaylan-network
