@@ -6,15 +6,15 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      # Mount volume for persistent storage of results
-      - ./hasil:/app/results
-      - ./uploads:/app/uploads
+      # Mount volume for persistent storage of results (Windows paths)
+      - ./hasil:C:/app/results
+      - ./uploads:C:/app/uploads
     environment:
       - PYTHONUNBUFFERED=1
       - PYTHONDONTWRITEBYTECODE=1
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      test: ["CMD", "powershell", "-Command", "try { Invoke-RestMethod -Uri 'http://localhost:8000/docs' -Method Get -TimeoutSec 10; exit 0 } catch { exit 1 }"]
       interval: 30s
       timeout: 10s
       retries: 3
