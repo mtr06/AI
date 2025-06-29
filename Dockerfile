@@ -1,22 +1,38 @@
-# Use Python 3.10 Windows Server Core image
-FROM python:3.10-windowsservercore
+# Use Python 3.10 slim image for smaller size
+FROM python:3.10-slim
 
 # Set working directory
-WORKDIR C:/app
+WORKDIR /app
 
-# Set PowerShell as the default shell
-SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
-
-# Install Visual C++ Redistributable (required for some Python packages)
-RUN Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile "vc_redist.x64.exe"; \
-    Start-Process -FilePath "vc_redist.x64.exe" -ArgumentList "/quiet" -Wait; \
-    Remove-Item "vc_redist.x64.exe"
+# Install system dependencies required for OpenCV, NCNN, and other libraries
+RUN apt-get update && apt-get install -y \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgomp1 \
+    libgcc-s1 \
+    libstdc++6 \
+    libfontconfig1 \
+    libice6 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libxss1 \
+    libxtst6 \
+    libgtk-3-0 \
+    libavcodec58 \
+    libavformat58 \
+    libswscale5 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements file
 COPY req.txt .
 
-# Upgrade pip and install Python dependencies
-RUN python -m pip install --upgrade pip; \
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r req.txt
 
 # Copy application files
@@ -24,9 +40,7 @@ COPY main2.py .
 COPY yolov11m_tugas_akhir_pretrained_ncnn_model/ ./yolov11m_tugas_akhir_pretrained_ncnn_model/
 
 # Create directories for uploads and results
-RUN New-Item -ItemType Directory -Path "C:/app/uploads" -Force; \
-    New-Item -ItemType Directory -Path "C:/app/results" -Force; \
-    New-Item -ItemType Directory -Path "C:/app/temp" -Force
+RUN mkdir -p /app/uploads /app/results /app/temp
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
@@ -35,9 +49,9 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Expose port
 EXPOSE 8000
 
-# Health check using PowerShell
+# Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD powershell -Command "try { Invoke-RestMethod -Uri 'http://localhost:8000/docs' -Method Get -TimeoutSec 10; exit 0 } catch { exit 1 }"
+    CMD curl -f http://localhost:8000/docs || exit 1
 
 # Run the application
-CMD ["python", "-m", "uvicorn", "main2:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+CMD ["uvicorn", "main2:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
