@@ -1,0 +1,51 @@
+version: "3.8"
+
+services:
+  iot-agrari-ai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: iot-agrari-ai-container
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount volume untuk persistent storage hasil deteksi
+      - type: bind
+        source: ./hasil
+        target: C:/app/hasil
+      # Mount volume untuk test images (optional)
+      - type: bind
+        source: ./test_images
+        target: C:/app/test_images
+        read_only: true
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=C:/app
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "powershell",
+          "-command",
+          "try { Invoke-WebRequest -Uri http://localhost:8000/docs -UseBasicParsing | Out-Null; exit 0 } catch { exit 1 }",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Resource limits (optional)
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: "2.0"
+        reservations:
+          memory: 2G
+          cpus: "1.0"
+
+# Optional: Network untuk microservices
+networks:
+  default:
+    name: iot-agrari-network

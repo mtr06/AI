@@ -62,7 +62,7 @@ async def predict(
 
     # Simpan hasil gambar ke dalam folder
     img_bgr = results[0].plot()
-    img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+    img_rgb = img_bgr[..., ::-1]
     img_pil = Image.fromarray(img_rgb)
     output_filename = f"result_{uuid.uuid4().hex}.jpg"
     output_path = os.path.join(folder, output_filename)

@@ -1,0 +1,60 @@
+# Git files
+.git
+.gitignore
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environment (tidak diperlukan di container)
+Scripts/
+share/
+pyvenv.cfg
+Lib/
+Include/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Test files (kecuali yang diperlukan)
+test.jpg
+temp_*
+
+# Documentation
+README.md
+*.md
+docs/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+
+# Model files yang tidak digunakan (main2.py hanya butuh NCNN model)
+yolov11m_tugas_akhir_pretrained.pt
+yolov11m_tugas_akhir_pretrained.torchscript
+yolov11m_tugas_akhir_pretrained_ncnn_model.zip
+
+# Main.py (karena kita hanya menjalankan main2.py)
+main2.py
+
+# Hasil folder contents (akan di-mount sebagai volume)
+hasil/*
