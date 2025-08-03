@@ -4,3 +4,9 @@ pillow
 python-multipart
 ultralytics
 opencv-python-headless
+onnx>=1.12.0,<1.18.0
+onnxslim>=0.1.56
+onnxruntime>=1.16.0
+coloredlogs
+flatbuffers
+humanfriendly
