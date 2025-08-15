@@ -34,8 +34,8 @@ async def predict(
 
     # Ubah label ke "fresh" dan "rotten"
     results[0].names = {
-        0: 'fresh',
-        1: 'rotten'
+        0: 'segar',
+        1: 'busuk'
     }
 
     # Hitung jumlah fresh dan rotten
